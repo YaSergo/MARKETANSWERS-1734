@@ -18,3 +18,5 @@ cpm_data$pvalue <- pvalue_tdist(m = cpm_data$avg_cpm, s = cpm_data$sd, n = cpm_d
 
 # формируем data frame с "хорошими" hyper_id
 cpm_data_good <- cpm_data[cpm_data$pvalue < 0.05, ]
+
+write.csv(x = cpm_data_good, file = "output/good_hyper_id.csv")
