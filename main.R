@@ -35,6 +35,8 @@ p <- ggplot(data = cpm_data_good[cpm_data_good$category_id %in% category_id_good
   geom_density(alpha = 0.6)
 ggsave(filename="./output/density.jpg", plot=p)
 
+# загрузка данных о предлоежения для конкретной модели
+# данные выгружены из HIVE: https://paste.yandex-team.ru/170976
 offers_data <- read.csv(file = "~/Downloads/query_result (39).csv", na.strings = "NULL")
 #cpm_data_ext <- merge(x = cpm_data, y = offers_data, by = "hyper_id", all.x = TRUE)
 cpm_data_good_ext <- merge(x = cpm_data_good, y = offers_data, by = "hyper_id", all.x = TRUE)
@@ -44,21 +46,21 @@ corr_func <- function(coef, cpm, cpc, feeincome){
   return(cor(x = cpm, y = cpc * coef + feeincome))
 }
 
-coef <- seq(from = 0, to = 75, by = 0.1)
+coef  <- seq(from = 0, to = 100, by = 0.1)
 y_all <- sapply(coef, function(x){corr_func(x, cpm = cpm_data_good_ext$avg_cpm,
-                                   cpc = cpm_data_good_ext$avg_cbid_all,
-                                   feeincome = cpm_data_good_ext$avg_feeincome_all)})
-y_15 <- sapply(coef, function(x){corr_func(x, cpm = cpm_data_good_ext$avg_cpm,
-                                           cpc = cpm_data_good_ext$avg_cbid_15,
-                                           feeincome = cpm_data_good_ext$avg_feeincome_15)})
-y_30 <- sapply(coef, function(x){corr_func(x, cpm = cpm_data_good_ext$avg_cpm,
-                                           cpc = cpm_data_good_ext$avg_cbid_30,
-                                           feeincome = cpm_data_good_ext$avg_feeincome_30)})
-y_45 <- sapply(coef, function(x){corr_func(x, cpm = cpm_data_good_ext$avg_cpm,
-                                           cpc = cpm_data_good_ext$avg_cbid_45,
-                                           feeincome = cpm_data_good_ext$avg_feeincome_45)})
+                                            cpc = cpm_data_good_ext$avg_cbid_all,
+                                            feeincome = cpm_data_good_ext$avg_feeincome_all)})
+y_15  <- sapply(coef, function(x){corr_func(x, cpm = cpm_data_good_ext$avg_cpm,
+                                            cpc = cpm_data_good_ext$avg_cbid_15,
+                                            feeincome = cpm_data_good_ext$avg_feeincome_15)})
+y_30  <- sapply(coef, function(x){corr_func(x, cpm = cpm_data_good_ext$avg_cpm,
+                                            cpc = cpm_data_good_ext$avg_cbid_30,
+                                            feeincome = cpm_data_good_ext$avg_feeincome_30)})
+y_45  <- sapply(coef, function(x){corr_func(x, cpm = cpm_data_good_ext$avg_cpm,
+                                            cpc = cpm_data_good_ext$avg_cbid_45,
+                                            feeincome = cpm_data_good_ext$avg_feeincome_45)})
 
-
+# формируем data.frame для построения графика
 plotdata <- data.frame(coef = coef, y = c(y_all, y_15, y_30, y_45),
                        type = as.factor(c(rep("all", length(y_all)),
                                           rep("15", length(y_15)),
@@ -73,6 +75,7 @@ p <- ggplot(data = plotdata, aes(x = coef, y = y, col = type))+
 print(p)
 ggsave(filename="./output/corr.jpg", plot=p)
 
+# пробуем предсказать значения CPM и смотрим на результат
 cpm_data_good_ext$cpm.predict <- cpm_data_good_ext$avg_cbid_se*28 + cpm_data_good_ext$avg_feeincome_fe
 ggplot(data = cpm_data_good_ext, aes(x = cpm_data_good_ext$cpm.predict,
                                      y = cpm_data_good_ext$avg_cpm))+
