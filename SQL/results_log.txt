@@ -1,0 +1,19 @@
+query_result (61).csv -- по старому запросу
+set start_date='2016-09-15';
+set end_date=  '2016-11-15';
+set n_groups=   100;
+-- 546
+
+query_result (62).csv -- по старому запросу
+set start_date='2016-10-15';
+set end_date=  '2016-11-15';
+set n_groups=   100;
+-- 547
+
+query_result (63).csv
+set start_date='2016-08-15';
+set end_date=  '2016-11-15';
+set n_groups=   100;
+-- 535
+
+проблема "+1" не ушла

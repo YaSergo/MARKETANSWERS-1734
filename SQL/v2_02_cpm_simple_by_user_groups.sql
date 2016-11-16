@@ -1,4 +1,4 @@
-set start_date='2016-10-17';
+set start_date='2016-09-15';
 set end_date=  '2016-11-15';
 set n_groups=   100;
 
@@ -95,6 +95,8 @@ SELECT
       hyper_id;
 
 SELECT
+  -- добавляем данные о диапазоне дат
+  -- значительно увеличивает размер выгрузки
   ${hiveconf:start_date} AS start_date,
   ${hiveconf:end_date} AS end_date,
 
@@ -128,4 +130,6 @@ FROM
     ma1734_access.user_group
 ) a
 GROUP BY hyper_id
-HAVING cpm_avg > 0
+HAVING
+  cpm_avg > sd
+  AND n > 30
