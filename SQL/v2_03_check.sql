@@ -1,4 +1,7 @@
-set start_date='2016-09-15';
+-- проверить, что нет кликов, которые не подвязываются к access
+
+
+set start_date='2016-11-15';
 set end_date=  '2016-11-15';
 set n_groups=   100;
 
@@ -26,6 +29,7 @@ WITH access AS (
       WHERE
         day BETWEEN ${hiveconf:start_date} AND ${hiveconf:end_date}
         AND nvl(yandexuid, '') <> ''
+        AND cast(yandexuid as double) IS NOT NULL -- yandexuid бывает каким-то мусором, убираем такие записи
         AND status = '200' -- страница загружена без ошибок
         AND nvl(instr(vhost, 'market.yandex.'), 0) = 1 -- только desktop
         -- в рамках данной задачи не критично, но лучше было бы исключить ещё данные о сотрудниках яндекса
@@ -95,42 +99,22 @@ SELECT
       hyper_id
 )
 
-SELECT
-  -- добавляем данные о диапазоне дат
-  -- значительно увеличивает размер выгрузки
-  ${hiveconf:start_date} AS start_date,
-  ${hiveconf:end_date} AS end_date,
 
-  hyper_id,
-  AVG(cpm) AS cpm_avg, -- в рублях за один показ
-  COUNT(*) AS n,
-  STDDEV_SAMP(cpm) AS sd,
-  collect_list(cpm) AS cpm_array -- для отладки
+SELECT
+  *
 FROM
-(
-  SELECT
-    access.hyper_id,
-    access.user_group,
-    (sum(nvl(cpa_price, 0)) + sum(nvl(cpc_price, 0))) / sum(n_shows) AS cpm
-  FROM
-    access LEFT JOIN
-    (
-      SELECT
-        nvl(cpc_clicks.yandexuid, cpa_clicks.yandexuid) AS yandexuid,
-        nvl(cpc_clicks.hyper_id, cpa_clicks.hyper_id) AS hyper_id,
-        cpc_price,
-        cpa_price
-      FROM cpc_clicks FULL JOIN cpa_clicks
-      ON cpc_clicks.yandexuid = cpa_clicks.yandexuid
-        AND cpc_clicks.hyper_id = cpa_clicks.hyper_id
-    ) clicks
-    ON access.yandexuid = clicks.yandexuid
-      AND access.hyper_id = clicks.hyper_id
-  GROUP BY
-    access.hyper_id,
-    access.user_group
-) a
-GROUP BY hyper_id
-HAVING
-  cpm_avg > sd
-  AND n > 30
+  access FULL JOIN
+  (
+    SELECT
+      nvl(cpc_clicks.yandexuid, cpa_clicks.yandexuid) AS yandexuid,
+      nvl(cpc_clicks.hyper_id, cpa_clicks.hyper_id) AS hyper_id,
+      cpc_price,
+      cpa_price
+    FROM cpc_clicks FULL JOIN cpa_clicks
+    ON cpc_clicks.yandexuid = cpa_clicks.yandexuid
+      AND cpc_clicks.hyper_id = cpa_clicks.hyper_id
+  ) clicks
+  ON access.yandexuid = clicks.yandexuid
+    AND access.hyper_id = clicks.hyper_id
+WHERE
+  access.yandexuid IS NULL

@@ -1,5 +1,5 @@
 # загрузка данных
-cpm_data <- read.csv("~/Downloads/query_result (62).csv")
+cpm_data <- read.csv("~/Downloads/query_result (83).csv")
 cpm_data <- cpm_data[cpm_data$n > 30, ]
 
 # функция для расчёта p-value
@@ -14,11 +14,10 @@ pvalue_tdist <- function(m, s, n, threshold = 10){
 }
 
 # считаем p-value
-cpm_data$pvalue <- pvalue_tdist(m = cpm_data$cpm_avg, s = cpm_data$sd, n = cpm_data$n)
+cpm_data$pvalue <- pvalue_tdist(m = cpm_data$cpm_avg, s = cpm_data$sd, n = cpm_data$n, threshold = 10)
 #write.csv(x = cpm_data, file = "output/cpm_data.csv")
-
 # формируем data frame с "хорошими" hyper_id
-cpm_data_good <- cpm_data[cpm_data$pvalue < 0.05, ]
+cpm_data_good <- cpm_data[cpm_data$pvalue < 0.10, ]
 cpm_data_good$pvalue <- round(cpm_data_good$pvalue, 4)
 
 write.csv(x = cpm_data_good, file = "output/cpm_data_good.csv")

@@ -16,4 +16,50 @@ set end_date=  '2016-11-15';
 set n_groups=   100;
 -- 535
 
-проблема "+1" не ушла
+query_result (64).csv
+set start_date='2016-11-01';
+set end_date=  '2016-11-15';
+set n_groups=   100;
+-- 257
+
+query_result (65).csv -- тут встречаются 51
+set start_date='2016-10-15';
+set end_date=  '2016-11-15';
+set n_groups=   50;
+-- 545
+
+query_result (66).csv
+set start_date='2016-11-10';
+set end_date=  '2016-11-15';
+set n_groups=   100;
+-- 87
+
+query_result (67).csv  -- по новому запросу
+set start_date='2016-10-15';
+set end_date=  '2016-11-15';
+set n_groups=   100;
+-- 522
+
+query_result (68).csv  -- по новому запросу
+set start_date='2016-10-10';
+set end_date=  '2016-11-15';
+set n_groups=   50;
+-- 519
+
+query_result (69).csv  -- новейший ) запрос
+set start_date='2016-10-15';
+set end_date=  '2016-11-15';
+set n_groups=   50;
+-- 516
+
+query_result (70).csv  -- новейший ) запрос
+set start_date='2016-11-01';
+set end_date=  '2016-11-15';
+set n_groups=   50;
+-- 244
+
+query_result (71).csv  -- новейший ) запрос
+set start_date='2016-11-10';
+set end_date=  '2016-11-15';
+set n_groups=   50;
+-- 82
